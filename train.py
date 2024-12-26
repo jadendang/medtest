@@ -17,6 +17,8 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
+joblib.dump(scaler, "models/scaler.pkl")
+
 encoder = LabelEncoder()
 y_train = encoder.fit_transform(y_train)
 y_test = encoder.transform(y_test)
@@ -31,6 +33,8 @@ print("Classification Report:\n", classification_report(y_test, y_pred))
 joblib.dump(model, "models/model.pkl")
 
 model = joblib.load("models/model.pkl")
+scaler = joblib.load("models/scaler.pkl")
+
 
 st.title("Diabetes Prediction")
 
@@ -45,17 +49,17 @@ dpf = st.number_input("Diabetes Pedigree Function", min_value=0.0, max_value=2.0
 
 
 input_data = pd.DataFrame({
-    "Pregnancies": [0],
+    "Pregnancies": [pregnancies],
     "Glucose": [glucose],
-    "BloodPressure": [70],
-    "SkinThickness": [20],
-    "Insulin": [80],
+    "BloodPressure": [blood_pressure],
+    "SkinThickness": [skin_thickness],
+    "Insulin": [insulin],
     "BMI": [bmi],
-    "DiabetesPedigreeFunction": [0.5],
+    "DiabetesPedigreeFunction": [dpf],
     "Age": [age]
 })
 
 if st.button("Predict"):
-    input_data = scaler.transform(input_data)
+    input_data_scaled = scaler.transform(input_data)
     prediction = model.predict(input_data)
     st.write("Prediction:", "Diabetes Detected" if prediction[0] == 1 else "No Diabetes Detected")

@@ -17,7 +17,7 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.transform(X_test)
 
-joblib.dump(scaler, "models/scaler.pkl")
+# joblib.dump(scaler, "models/scaler.pkl")
 
 encoder = LabelEncoder()
 y_train = encoder.fit_transform(y_train)
@@ -30,11 +30,10 @@ y_pred = model.predict(X_test)
 print("Accuracy:", accuracy_score(y_test, y_pred))
 print("Classification Report:\n", classification_report(y_test, y_pred))
 
-joblib.dump(model, "models/model.pkl")
+# joblib.dump(model, "models/model.pkl")
 
 model = joblib.load("models/model.pkl")
 scaler = joblib.load("models/scaler.pkl")
-
 
 st.title("Diabetes Prediction")
 

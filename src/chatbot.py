@@ -1,12 +1,18 @@
 import openai
+from openai import ChatCompletion
 import joblib
 import pandas as pd
 import streamlit as st
+
+from tools.utils import get_recs, load_data
+
 
 model = joblib.load("models/model.pkl")
 scaler = joblib.load("models/scaler.pkl")
 
 openai.api_key = "openai_api_key"
+
+diet_data = load_data("data/diet_data.json")
 
 st.title("Diabetes Chatbot")
 
@@ -49,10 +55,20 @@ user_input = st.text_input("Ask GPT a question")
 
 if st.button("Ask GPT"):
     if user_input.strip():
+
+        recommendations = get_recs(diet_data, user_input)
+        recommendations_str = "\n".join([f"- {rec}" for rec in recommendations])
+
+        gpt_prompt = (
+            "You are a helpful assistant specialized in healthcare and diabetes management.\n"
+            f"Based on the following dietary recommendations:\n{recommendations_str}\n"
+            "Answer the user's question accurately and in a supportive tone."
+        )
+
         response = openai.ChatCompletion.create(
             model = "gpt-3.5-turbo",
             messages = [
-                {"role": "system", "content": "You are a helpful assistant specialized in healthcare and the dataset of diabetes."},
+                {"role": "system", "content": gpt_prompt},
                 {"role": "user", "content": user_input}
             ]
         )
